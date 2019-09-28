@@ -1,4 +1,5 @@
-import PerformanceCalculator from "./PerformanceCalculator";
+import TragedyCalculator from "./calculator/TragedyCalculator";
+import ComedyCalculator from "./calculator/ComedyCalculator";
 
 export default function createStatementData(invoice, plays) {
   const statementData = {};
@@ -9,7 +10,7 @@ export default function createStatementData(invoice, plays) {
   return statementData;
 
   function enrichPerformance(performance) {
-    const calculator = new PerformanceCalculator(
+    const calculator = createPerformanceCalculator(
       performance,
       playFor(performance)
     );
@@ -18,6 +19,17 @@ export default function createStatementData(invoice, plays) {
     result.amount = calculator.amount;
     result.volumeCredits = calculator.volumeCredits;
     return result;
+  }
+
+  function createPerformanceCalculator(performance, play) {
+    switch (play.type) {
+      case "tragedy":
+        return new TragedyCalculator(performance, play);
+      case "comedy":
+        return new ComedyCalculator(performance, play);
+      default:
+        throw new Error(`unknown type: ${this.play.type}`);
+    }
   }
 
   function totalAmount(data) {
