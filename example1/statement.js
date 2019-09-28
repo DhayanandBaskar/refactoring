@@ -15,19 +15,11 @@ export function statement(invoice, plays) {
   }
 
   function totalAmount(data) {
-    let totalAmount = 0;
-    for (let performance of data.performances) {
-      totalAmount += performance.amount;
-    }
-    return totalAmount;
+    return data.performances.reduce((total, p) => total + p.amount, 0);
   }
 
   function totalvolumeCredits(data) {
-    let volumeCredits = 0;
-    for (let performance of data.performances) {
-      volumeCredits += performance.volumeCredits;
-    }
-    return volumeCredits;
+    return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
   }
 
   function playFor(performance) {
