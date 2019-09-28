@@ -2,21 +2,25 @@ export function statement(invoice, plays) {
   const statementData = {};
   statementData.customer = invoice.customer;
   statementData.performances = invoice.performances.map(enrichPerformance);
-  return renderPlainText(statementData, plays);
+  return renderPlainText(statementData);
 
   function enrichPerformance(performance) {
     const result = Object.assign({}, performance);
+    result.play = playFor(performance);
     return result;
+  }
+  function playFor(performance) {
+    return plays[performance.playID];
   }
 }
 
-export function renderPlainText(data, plays) {
+export function renderPlainText(data) {
   let result = `Statement for ${data.customer}\n`;
 
   for (let performance of data.performances) {
-    result += `  ${playFor(performance).name}: ${usd(
-      amountFor(performance)
-    )} (${performance.audience} seats)\n`;
+    result += `  ${performance.play.name}: ${usd(amountFor(performance))} (${
+      performance.audience
+    } seats)\n`;
   }
   result += `Amount owed is ${usd(totalAmount())}\n`;
   result += `You earned ${totalvolumeCredits()} credits\n`;
@@ -49,14 +53,14 @@ export function renderPlainText(data, plays) {
   function volumeCreditsFor(performance) {
     let volumeCredits = 0;
     volumeCredits += Math.max(performance.audience - 30, 0);
-    if ("comedy" === playFor(performance).type)
+    if ("comedy" === performance.play.type)
       volumeCredits += Math.floor(performance.audience / 5);
     return volumeCredits;
   }
 
   function amountFor(performance) {
     let amount = 0;
-    switch (playFor(performance).type) {
+    switch (performance.play.type) {
       case "tragedy":
         amount = 40000;
         if (performance.audience > 30) {
@@ -71,12 +75,8 @@ export function renderPlainText(data, plays) {
         amount += 300 * performance.audience;
         break;
       default:
-        throw new Error(`unknown type: ${playFor(performance).type}`);
+        throw new Error(`unknown type: ${performance.play.type}`);
     }
     return amount;
-  }
-
-  function playFor(performance) {
-    return plays[performance.playID];
   }
 }
