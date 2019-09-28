@@ -9,8 +9,6 @@ export function statement(invoice, plays) {
   }).format;
 
   for (let performance of invoice.performances) {
-    let thisAmount = amountFor(performance);
-
     // add volume credits
     volumeCredits += Math.max(performance.audience - 30, 0);
     // add extra credit for every ten comedy attendees
@@ -18,10 +16,10 @@ export function statement(invoice, plays) {
       volumeCredits += Math.floor(performance.audience / 5);
 
     // print line for this order
-    result += `  ${playFor(performance).name}: ${format(thisAmount / 100)} (${
-      performance.audience
-    } seats)\n`;
-    totalAmount += thisAmount;
+    result += `  ${playFor(performance).name}: ${format(
+      amountFor(performance) / 100
+    )} (${performance.audience} seats)\n`;
+    totalAmount += amountFor(performance);
   }
   result += `Amount owed is ${format(totalAmount / 100)}\n`;
   result += `You earned ${volumeCredits} credits\n`;
